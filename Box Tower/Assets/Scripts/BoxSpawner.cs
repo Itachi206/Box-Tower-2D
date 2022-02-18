@@ -6,10 +6,6 @@ public class BoxSpawner : MonoBehaviour
 {
     public GameObject boxPrefab;
 
-    private void Start()
-    {
-       
-    }
     public void SpawnBox()
     {
         //initialize the box prefab 

@@ -7,10 +7,12 @@ public class BoxController : MonoBehaviour
     private float min_x = -2.4f, max_x = 2.4f;
 
     private bool canMove;
-    private float moveSpeed = 2f;
+    private float moveSpeed = 3f;
 
     private Rigidbody2D boxRigidbody;
-        
+    
+    //public BoxSpawner boxSpawner;
+            
     private bool gameOver;
     private bool ignoreCollision;
     private bool ignoreTrigger;
@@ -19,7 +21,7 @@ public class BoxController : MonoBehaviour
     {
         //get the reference of the rigidbody 
         boxRigidbody = GetComponent<Rigidbody2D>();
-
+        
     }
 
     void Start()
@@ -30,14 +32,15 @@ public class BoxController : MonoBehaviour
             moveSpeed *= -1f; //
         }
 
-        GamePlayController.instance.currentBox = this;      //gets the current box reference
-
+        GamePlayController.instance.currentBox = this;     //gets the current box reference
     }
 
 
     void Update()
     {
         MoveBox();
+        AudioManager.Instance.sfxVol.value = 0.7f;
+        AudioManager.Instance.musicVol.value = 0.3f;
     }
 
     private void MoveBox()
@@ -85,20 +88,36 @@ public class BoxController : MonoBehaviour
         GamePlayController.instance.RestartGame();
     }
 
+    void GameOverScreen()
+    {
+        GamePlayController.instance.GameOverScreen();
+    }
     private void OnCollisionEnter2D(Collision2D target)
     {
         if (ignoreCollision)
         {
             return;
         }
-        
-        if(target.gameObject.tag == "Platform" || target.gameObject.tag == "Box")
+
+        if (target.collider.tag == "Platform") 
         {
+            Debug.Log("hitted a platform");
+            AudioManager.Instance.PlayEffect(SoundEnum.BoxCollision);
+
             GamePlayController.instance.moveCount++;
             ScoreController.instance.IncreaseScore(10);
             Invoke("Landed", 1f);
             ignoreCollision = true;
-           
+        }
+        else if(target.gameObject.tag == "Box")
+        {
+            Debug.Log("hitted a box");
+            AudioManager.Instance.PlayEffect(SoundEnum.BoxCollision);
+
+            GamePlayController.instance.moveCount++;
+            ScoreController.instance.IncreaseScore(10);
+            Invoke("Landed", 1f);
+            ignoreCollision = true;
         }
     }
 
@@ -108,23 +127,24 @@ public class BoxController : MonoBehaviour
         {
             return;
         }
-
-        if (target.gameObject.tag == "GameOver" )
+       if (target.gameObject.tag == "GameOver" )
         {
+            //Destroy(boxSpawner.boxPrefab);
             HealthBar.instance.chance--;
             if(HealthBar.instance.chance <= 0)
             {
-                CancelInvoke("Landed");
+                Debug.Log("chances over ");
                 gameOver = true;
                 ignoreTrigger = true;
 
-                Invoke("RestartGame", 1f);
+                Invoke("GameOverScreen", 1f);
             }
             else
             {
-                Invoke("Landed", 1f);
-                ignoreCollision = true;
+                Debug.Log("Gameover");                
+                ignoreTrigger = true;
                 HealthBar.instance.UpdateHealth();
+                Invoke("Landed", 1f);
             }
             
            

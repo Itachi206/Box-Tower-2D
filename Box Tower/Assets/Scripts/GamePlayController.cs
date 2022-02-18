@@ -9,11 +9,16 @@ public class GamePlayController : MonoBehaviour
     public static GamePlayController instance;
 
     public BoxSpawner boxSpawner;
+    public GameObject gameOverScreen;
 
     [HideInInspector] public BoxController currentBox;       //to hid the attribute in inspector panel
 
     public CameraFollow cameraScript;
-    public int moveCount;
+    public int moveCount = 0;
+
+    
+    public GameObject platformtransform;
+    public GameObject gameovertransform;
 
 
     private void Awake()
@@ -46,7 +51,7 @@ public class GamePlayController : MonoBehaviour
 
     public void SpawnNewBox()
     {
-        Invoke("NewBox", 2f);       //invoke the newbox function after 2 sec
+        Invoke("NewBox", 0.5f);       //invoke the newbox function after 2 sec
     }
     void NewBox()
     {
@@ -57,9 +62,10 @@ public class GamePlayController : MonoBehaviour
     {
         if(moveCount == 3)
         {
+           cameraScript.targetPos.y += 2f;
             moveCount = 0;
-            cameraScript.targetPos.y += 2f;
         }
+       // PlatformBelowGameOver();
     }
 
     public void RestartGame()
@@ -67,5 +73,19 @@ public class GamePlayController : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);             //get the current active scene name
     }
 
+    internal void GameOverScreen()
+    {
+        gameOverScreen.SetActive(true);
+    }
+
+    /*public void PlatformBelowGameOver()
+    {
+        if (platformtransform.transform.position.y < gameovertransform.transform.position.y)
+        {
+            platformtransform.SetActive(false);
+        }
+                 
+    }*/
+    
 }
 
